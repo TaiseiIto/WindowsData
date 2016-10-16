@@ -1,0 +1,2 @@
+class UnittestFailure extends RuntimeException {
+}
