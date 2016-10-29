@@ -265,12 +265,12 @@ void	LangtonsAnt(HWND		hWnd)
 		Point.y		=	HALF(Rect.bottom);
 		for(i = 0; i < sizeof(ChangeOfDirection)	*	CHAR_BIT; i++)
 		{
+			ChangeOfDirection	<<=	1;
 			ChangeOfDirection	+=	(unsigned int)my_rand
 							(
 						 		0,
 								1
 							);
-			ChangeOfDirection	<<=	1;
 		}
 		FirstCall	=	FALSE;
 	}
