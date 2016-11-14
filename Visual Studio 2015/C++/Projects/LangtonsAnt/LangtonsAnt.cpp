@@ -1,6 +1,6 @@
-#include	<limits.h>
-#include	<stdio.h>
-#include	<time.h>
+#include	<iostream>
+#include	<string>
+#include	<ctime>
 #include	<Windows.h>
 #include	"MathLibrary.h"
 #define		BLACK								(RGB(0,0,0))
@@ -25,17 +25,21 @@ LRESULT	CALLBACK	MainWndProc
 
 void	LangtonsAnt(HWND	hWnd);
 
+MathLibrary::Bits ChangeOfDirection;
+
 int	WINAPI	WinMain
 (
 	HINSTANCE	hInstance,
 	HINSTANCE	hPreInstance,
 	LPSTR		lpszCmdLine,
-	int			nCmdShow
+	int		nCmdShow
 )
 {
 	HWND		hMainWnd;
 	MSG			Msg;
 	WNDCLASS	MainWndClass;
+	std::string	strCmdLine		=	lpszCmdLine;
+	ChangeOfDirection			=	strCmdLine;
 	MainWndClass.cbClsExtra			=	NO_EXTRA;
 	MainWndClass.cbWndExtra			=	NO_EXTRA;
 	MainWndClass.hbrBackground		=	(HBRUSH)GetStockObject(BLACK_BRUSH);
@@ -149,15 +153,16 @@ LRESULT	CALLBACK	MainWndProc
 void	LangtonsAnt(HWND		hWnd)
 {
 	COLORREF	Color			=	BLACK;
+	BYTE			ColorStep	=	0;
 	static	BOOL		FirstCall		=	TRUE;
 	static	POINT		Point;
 	static	RECT		Rect;
 	static	BYTE		Direction		=	0;
-	static	unsigned int	ChangeOfDirection	=	0;
 		BYTE		ColorValue		=	GetRValue(Color);
 	HDC			hDC;
 	int			MaximumDifference,
 				MinimumDifference;
+	MathLibrary::Bits	One			=	MathLibrary::Bits("1");
 	if(FirstCall)
 	{
 		size_t i;
@@ -165,21 +170,23 @@ void	LangtonsAnt(HWND		hWnd)
 		GetClientRect(hWnd, &Rect);
 		Point.x		=	HALF(Rect.right);
 		Point.y		=	HALF(Rect.bottom);
-		ChangeOfDirection=123;
 		FirstCall	=	FALSE;
 	}
-	hDC	=	GetDC(hWnd);
+	hDC		=	GetDC(hWnd);
 	Color	=	GetPixel
 			(
 			 	hDC,
 				(int)Point.x,
 				(int)Point.y
 			);
+	ColorStep	=	GetRValue(Color) * (ChangeOfDirection.getSize() - 1) / BYTE_MAX;
+	ColorStep	+=	1;
+	if(ColorStep	==	ChangeOfDirection.getSize())ColorStep	=	0;
 	Color	=	RGB
 			(
-			 	GetRValue(Color)	+	BYTE_MAX / (sizeof(ChangeOfDirection) * CHAR_BIT),
-			 	GetGValue(Color)	+	BYTE_MAX / (sizeof(ChangeOfDirection) * CHAR_BIT),
-			 	GetBValue(Color)	+	BYTE_MAX / (sizeof(ChangeOfDirection) * CHAR_BIT)
+			 	ColorStep * BYTE_MAX / (ChangeOfDirection.getSize() - 1),
+			 	ColorStep * BYTE_MAX / (ChangeOfDirection.getSize() - 1),
+			 	ColorStep * BYTE_MAX / (ChangeOfDirection.getSize() - 1)
 			);
 	SetPixel
 	(
@@ -193,24 +200,27 @@ void	LangtonsAnt(HWND		hWnd)
 		hWnd,
 		hDC
 	);
-	if((1<<(GetRValue(Color)*sizeof(ChangeOfDirection)*CHAR_BIT/BYTE_MAX)&ChangeOfDirection))Direction++;
+	std::cout << (One << ColorStep) << std::endl;
+	std::cout << ChangeOfDirection << std::endl;
+	if((One << ColorStep & ChangeOfDirection >> ColorStep).getBit(0))Direction++;
 	else	Direction--;
 	switch(Direction%4)
 	{
 		case	0:
-			Point.y-=1;
+			if(Point.y == Rect.top + 1)	Point.y	=	Rect.bottom - 1;
+			else				Point.y-=1;
 			break;
 		case	1:
-			Point.x+=1;
+			if(Point.x == Rect.left + 1)	Point.x	=	Rect.right - 1;
+			else				Point.x-=1;
 			break;
 		case	2:
-			Point.y+=1;
+			if(Point.y == Rect.bottom - 1)	Point.y	=	Rect.top + 1;
+			else				Point.y+=1;
 			break;
 		case	3:
-			Point.x-=1;
+			if(Point.x == Rect.right - 1)	Point.x	=	Rect.left + 1;
+			else				Point.x+=1;
 	}
-	if(Point.x	<	0)		Point.x	=	0;
-	if(Point.y	<	0)		Point.y	=	0;
-	if(Point.x	>	Rect.right)	Point.x	=	Rect.right;
-	if(Point.y	>	Rect.bottom)	Point.y	=	Rect.bottom;
+	return;
 }
