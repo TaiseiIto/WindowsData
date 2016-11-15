@@ -152,8 +152,7 @@ LRESULT	CALLBACK	MainWndProc
 
 void	LangtonsAnt(HWND		hWnd)
 {
-	//COLORREF	Color			=	BLACK;
-	BYTE			**ColorStep;
+	static	BYTE		**ColorStep;
 	static	BOOL		FirstCall		=	TRUE;
 	static	POINT		Point;
 	static	RECT		Rect;
@@ -169,34 +168,14 @@ void	LangtonsAnt(HWND		hWnd)
 		GetClientRect(hWnd, &Rect);
 		Point.x		=	HALF(Rect.right);
 		Point.y		=	HALF(Rect.bottom);
-		//ColorStep	=	new BYTE[Rect.right][Rect.bottom];
 		ColorStep	=	new BYTE*[Rect.right];
 		for(int i = 0; i < Rect.right; i++)ColorStep[i] = new BYTE[Rect.bottom];
 		for(int i = 0; i < Rect.right; i++)for(int j = 0; j < Rect.bottom; j++)ColorStep[i][j]=0;
 		FirstCall	=	FALSE;
 	}
 	hDC		=	GetDC(hWnd);
-	/*
-	Color	=	GetPixel
-			(
-			 	hDC,
-				(int)Point.x,
-				(int)Point.y
-			);
-	ColorStep	=	(GetRValue(Color) * (ChangeOfDirection.getSize() - 1) + 1) / BYTE_MAX;
-	ColorStep	+=	1;
-	//DEBUG
-	std::cout << (int)GetRValue(Color) << std::endl;
-	std::cout << (int)ColorStep << std::endl;
-	//DEBUG
-	if(ColorStep	==	ChangeOfDirection.getSize())ColorStep	=	0;
-	Color	=	RGB
-			(
-			 	ColorStep * BYTE_MAX / (ChangeOfDirection.getSize() - 1),
-			 	ColorStep * BYTE_MAX / (ChangeOfDirection.getSize() - 1),
-			 	ColorStep * BYTE_MAX / (ChangeOfDirection.getSize() - 1)
-			);
-	*/
+	if(((One << ColorStep[Point.x][Point.y] & ChangeOfDirection) >> ColorStep[Point.x][Point.y]).getBit(0))Direction++;
+	else	Direction--;
 	ColorStep[Point.x][Point.y] += 1;
 	if(ColorStep[Point.x][Point.y] == ChangeOfDirection.getSize())ColorStep[Point.x][Point.y] = 0;
 	SetPixel
@@ -216,15 +195,6 @@ void	LangtonsAnt(HWND		hWnd)
 		hWnd,
 		hDC
 	);
-	if(((One << ColorStep[Point.x][Point.y] & ChangeOfDirection) >> ColorStep[Point.x][Point.y]).getBit(0))Direction++;
-	else	Direction--;
-	/*DEBUG
-	std::cout << (int)ColorStep << std::endl;
-	std::cout << (One << ColorStep) << std::endl;
-	std::cout << (One << ColorStep & ChangeOfDirection) << std::endl;
-	std::cout << ((One << ColorStep & ChangeOfDirection) >> ColorStep) << std::endl;
-	std::cout << std::endl;
-	DEBUG*/
 	switch(Direction%4)
 	{
 		case	0:
