@@ -198,19 +198,19 @@ void	LangtonsAnt(HWND		hWnd)
 	switch(Direction%4)
 	{
 		case	0:
-			if(Point.y == Rect.top + 1)	Point.y	=	Rect.bottom - 1;
+			if(Point.y == Rect.top)	Point.y	=	Rect.bottom - 1;
 			else				Point.y-=1;
 			break;
 		case	1:
-			if(Point.x == Rect.left + 1)	Point.x	=	Rect.right - 1;
+			if(Point.x == Rect.left)	Point.x	=	Rect.right - 1;
 			else				Point.x-=1;
 			break;
 		case	2:
-			if(Point.y == Rect.bottom - 1)	Point.y	=	Rect.top + 1;
+			if(Point.y == Rect.bottom - 1)	Point.y	=	Rect.top;
 			else				Point.y+=1;
 			break;
 		case	3:
-			if(Point.x == Rect.right - 1)	Point.x	=	Rect.left + 1;
+			if(Point.x == Rect.right - 1)	Point.x	=	Rect.left;
 			else				Point.x+=1;
 	}
 	return;
